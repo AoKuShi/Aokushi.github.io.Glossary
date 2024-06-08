@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>용어사전 v1.0</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      background-color: black;
+      color: ghostwhite;
+    }
+
+    input, button {
+      margin: 10px;
+    }
+
+    body, div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+  <button id="start" onclick="func1()">용어 열람</button>
+  <div id="buttons"></div>
+  <div id="content"></div>
+
+  <script>
+    let dictionary = [];
+
+    function loadDictionary() {
+      const storedDictionary = localStorage.getItem('dictionary');
+      if (storedDictionary) {
+        dictionary = JSON.parse(storedDictionary);
+      } else {
+        fetch('dic.json')
+          .then(response => response.json())
+          .then(data => {
+            dictionary = data;
+            saveDictionary();
+          })
+          .catch(error => {
+            document.getElementById('content').textContent = '파일을 불러오는 중 오류가 발생했습니다.';
+            console.error('Fetch 오류:', error);
+          });
+      }
+      displayDictionary(dictionary);
+    }
+
+    function saveDictionary() {
+      localStorage.setItem('dictionary', JSON.stringify(dictionary));
+    }
+
+    function func1() {
+      const bt1 = document.getElementById('buttons');
+      bt1.innerHTML = `
+        <br>
+        <span class="inline-container">
+          <input type="text" id="search" name="searchN">
+          <button onclick="func2()">검색</button>
+        </span>
+        <br>
+        <br>
+        <textarea id="inputDic" name="inputDicN" rows="4" cols="64" placeholder="추가할 용어와 용어의 정의를 '용어 : 정의' 형식으로 입력하세요"></textarea>
+        <button onclick="func3()">추가</button>
+        <br>`;
+      
+      loadDictionary();
+    }
+
+    function displayDictionary(dictionary) {
+      const content = document.getElementById('content');
+      content.innerHTML = '<br><h3>--- 용어 목록 ---</h3><br><br>';
+
+      dictionary.forEach((item, index) => {
+        const term = document.createElement('p');
+        term.textContent = `# ${item.term}`;
+        content.appendChild(term);
+
+        const definition = document.createElement('p');
+        definition.textContent = `- ${item.definition}`;
+        content.appendChild(definition);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = '삭제';
+        deleteButton.onclick = () => func4(index);
+        content.appendChild(deleteButton);
+
+        content.appendChild(document.createElement('br'));
+      });
+    }
+
+    function func2() {
+      const searchTerm = document.getElementById('search').value.toLowerCase();
+      const filteredDictionary = dictionary.filter(item => item.term.toLowerCase().includes(searchTerm));
+
+      displayDictionary(filteredDictionary);
+    }
+
+    function func3() {
+      const inputDic = document.getElementById('inputDic').value;
+      const [term, definition] = inputDic.split(':').map(item => item.trim());
+
+      if (term && definition) {
+        dictionary.push({ term, definition });
+        saveDictionary();
+        displayDictionary(dictionary);
+        document.getElementById('inputDic').value = '';
+      } else {
+        alert(`용어와 정의를 '용어 : 정의' 형식으로 입력하세요.`);
+      }
+    }
+
+    function func4(index) {
+      dictionary.splice(index, 1);
+      saveDictionary();
+      displayDictionary(dictionary);
+    }
+  </script>
+
+</body>
+
+</html>
