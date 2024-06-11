@@ -26,8 +26,20 @@
 </head>
 
 <body>
-  <button id="start" onclick="func1()">용어 열람</button>
-  <div id="buttons"></div>
+  <button id="start" onclick="loadDictionary()">전체 용어 열람</button>
+
+  <div id="buttons">
+    <br>
+    <span class="inline-container">
+      <input type="text" id="search" name="searchN">
+      <button onclick="func2()">검색</button>
+    </span>
+    <br>
+    <br>
+    <textarea id="inputDic" name="inputDicN" rows="4" cols="64" placeholder="추가할 용어와 용어의 정의를 '용어 : 정의' 형식으로 입력하세요"></textarea>
+    <button onclick="func3()">추가</button>
+    <br>
+  </div>
   <div id="content"></div>
 
   <script>
@@ -54,23 +66,6 @@
 
     function saveDictionary() {
       localStorage.setItem('dictionary', JSON.stringify(dictionary));
-    }
-
-    function func1() {
-      const bt1 = document.getElementById('buttons');
-      bt1.innerHTML = `
-        <br>
-        <span class="inline-container">
-          <input type="text" id="search" name="searchN">
-          <button onclick="func2()">검색</button>
-        </span>
-        <br>
-        <br>
-        <textarea id="inputDic" name="inputDicN" rows="4" cols="64" placeholder="추가할 용어와 용어의 정의를 '용어 : 정의' 형식으로 입력하세요"></textarea>
-        <button onclick="func3()">추가</button>
-        <br>`;
-      
-      loadDictionary();
     }
 
     function displayDictionary(dictionary) {
@@ -121,7 +116,9 @@
       saveDictionary();
       displayDictionary(dictionary);
     }
-  </script>
+
+    window.onload = loadDictionary();
+</script>
 
 </body>
 
